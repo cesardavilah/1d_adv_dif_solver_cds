@@ -1,6 +1,15 @@
 import numpy as np
+import matplotlib.pyplot as plt
 
 
+# def exact_solution(phi_left, phi_right, u, L, rho, gamma, domain):
+#
+#     phi = np.zeros(x)
+#
+#     for x in domain:
+#         phi =
+#
+#     return phi
 
 def a_point_coefficients(GAMMA: float, domain: np.array, debug=False): #TODO
     '''
@@ -16,7 +25,7 @@ def a_point_coefficients(GAMMA: float, domain: np.array, debug=False): #TODO
         return p_coef
     #HELPER
 
-    apc = np.empty(len(domain)-1)
+    apc = np.zeros(len(domain)-2)
 
     counter = 0
     for i in range(1, len(domain)-1):
@@ -66,11 +75,13 @@ def a_east_coefficients(RHO: float, U: float, GAMMA: float, domain: np.array, de
         diffusive = -1*((GAMMA * 2) / (delta_xi_plus_one * (delta_xi + delta_xi_plus_one)))
 
         e_coef = convective + diffusive
-        return e_coef
+        return e_coef, convective, diffusive
     #HELPER
 
 
-    aec = np.empty(len(domain) - 1)
+    aec = np.zeros(len(domain) - 2)
+    aec_convective = np.zeros(len(domain) - 2)
+    aec_diffusive = np.zeros(len(domain) - 2)
 
     counter = 0
     for i in range(1, len(domain) - 1):
@@ -79,7 +90,7 @@ def a_east_coefficients(RHO: float, U: float, GAMMA: float, domain: np.array, de
         delta_xi = domain[i] - domain[i - 1]
         delta_xi_plus_one = domain[i + 1] - domain[i]
 
-        aec[counter] = a_east_at_idx(
+        aec[counter], aec_convective[counter], aec_diffusive[counter]  = a_east_at_idx(
             GAMMA=GAMMA,
             RHO=RHO,
             U=U,
@@ -102,7 +113,7 @@ def a_east_coefficients(RHO: float, U: float, GAMMA: float, domain: np.array, de
 
 
 
-    return aec
+    return aec, aec_convective, aec_diffusive
 
 def a_west_coefficients(RHO: float, U: float, GAMMA: float, domain: np.array, debug=False): #TODO
     '''
@@ -124,13 +135,15 @@ def a_west_coefficients(RHO: float, U: float, GAMMA: float, domain: np.array, de
                       ):
         convective = -1*((RHO * U) / (xi_plus_one - xi_minus_one))
 
-        diffusive = (GAMMA * 2) / (delta_xi * (delta_xi + delta_xi_plus_one))
+        diffusive = -1*((GAMMA * 2) / (delta_xi * (delta_xi + delta_xi_plus_one)))
 
         w_coef = convective + diffusive
-        return w_coef
+        return w_coef, convective, diffusive
     #HELPER
 
-    awc = np.empty(len(domain) - 1)
+    awc = np.zeros(len(domain) - 2)
+    awc_convective = np.zeros(len(domain) - 2)
+    awc_diffusive = np.zeros(len(domain) - 2)
 
     counter = 0
     for i in range(1, len(domain) - 1):
@@ -139,7 +152,7 @@ def a_west_coefficients(RHO: float, U: float, GAMMA: float, domain: np.array, de
         delta_xi = domain[i] - domain[i - 1]
         delta_xi_plus_one = domain[i + 1] - domain[i]
 
-        awc[counter] = a_west_at_idx(
+        awc[counter], awc_convective[counter], awc_diffusive[counter] = a_west_at_idx(
             GAMMA=GAMMA,
             RHO=RHO,
             U=U,
@@ -160,7 +173,7 @@ def a_west_coefficients(RHO: float, U: float, GAMMA: float, domain: np.array, de
         print(domain)
         print(awc)
 
-    return awc
+    return awc, awc_convective, awc_diffusive
 
 
 def initial_deltax(len_domain: float, expansion_ratio: float, number_of_elements: int):
@@ -181,7 +194,6 @@ def initial_deltax(len_domain: float, expansion_ratio: float, number_of_elements
 
 def discretize_domain(len_domain: float, expansion_ratio: float, number_of_elements: int, debug=False):
     '''
-
     :param len_domain:
     :param expansion_ration:
     :param number_of_elements:
@@ -207,8 +219,10 @@ def discretize_domain(len_domain: float, expansion_ratio: float, number_of_eleme
 
     if debug:
         print(f"This is deltax {delta_x}")
-        print(domain)
-
+        for d in domain:
+            print(d)
+        plt.scatter(domain, np.ones(len(domain)))
+        plt.show()
 
 
     return domain

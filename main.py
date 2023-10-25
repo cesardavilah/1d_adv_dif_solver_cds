@@ -13,50 +13,37 @@ if __name__ == '__main__':
     GAMMA = 650
 
     PHILEFT = 3
-    PHIRIGHT = 1
+    PHIRIGHT = 2
 
-    N = 10
-    EX_RATIO = 1.1
-
-
+    N = 100
+    EX_RATIO = 0.9
 
     #discretize the environment
-    domain = cds.discretize_domain(len_domain=L, expansion_ratio=EX_RATIO, number_of_elements=N, debug=True)
+    domain = cds.discretize_domain(len_domain=L, expansion_ratio=EX_RATIO, number_of_elements=N, debug=False)
 
-    #set up the variables aw ap and ae
+    #set up the variables ap, ae, and aw
     apc = cds.a_point_coefficients(GAMMA=GAMMA, domain=domain, debug=False)
-    aec = cds.a_east_coefficients(RHO=RHO, U=U, GAMMA=GAMMA, domain=domain, debug=False)
-    awc = cds.a_west_coefficients(RHO=RHO, U=U, GAMMA=GAMMA, domain=domain, debug=False)
+    aec, aec_convective, aec_diffusive = cds.a_east_coefficients(RHO=RHO, U=U, GAMMA=GAMMA, domain=domain, debug=False)
+    awc, awc_convective, awc_diffusive = cds.a_west_coefficients(RHO=RHO, U=U, GAMMA=GAMMA, domain=domain, debug=False)
+
+    #SANITY CHECK
+    #APCONV + AECONV + AWCONV = 0
+    san_check_conv = aec_convective + awc_convective
+    #APDIF + AEDIF + AWDIF = 0
+    san_check_dif = apc + aec_diffusive + awc_diffusive
+
+    #RHS of equation
+    b = np.zeros(len(domain) - 2)
+
+    #TDMA solver
+    solution_tdma = tdma.tdma_solver(ap=apc, ae=aec, aw=awc, phi_left=PHILEFT, phi_right=PHIRIGHT, b=b)
+
+    #Present solution
+    print(solution_tdma)
 
 
-    #set up the matrix
-    # num_rows = N-1
-    # num_cols = N-1
-    # p_matrix = np.empty((num_rows, num_cols))
-    # e_matrix = np.empty((num_rows, num_cols))
-    # w_matrix = np.empty((num_rows, num_cols))
-    p_matrix = np.diag(apc, 0)
-    e_matrix = np.diag(aec[:-1], 1)
-    w_matrix = np.diag(awc[1:], -1)
 
-    b = np.zeros(N-1)
-    b[0] = -1*awc[0]
-    b[-1] = -1*aec[-1]
-
-    matrix = p_matrix + e_matrix + w_matrix
-    #TODO CHECK THE MATRIX MANUALLY
-
-
+    plt.scatter(domain, solution_tdma)
+    plt.show()
 
     print("END")
-
-
-
-    #use tdma
-    solution = tdma.tdma_solver(matrix=matrix)
-
-
-    #present solution
-
-
-
