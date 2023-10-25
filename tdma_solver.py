@@ -1,6 +1,6 @@
 import numpy as np
 
-def tdma_solver(ap: np.array, ae: np.array, aw: np.array, b: np.array, phi_left, phi_right, debug=False):
+def tdma_solver(ap: np.array, ae: np.array, aw: np.array, phi_left, phi_right, debug=False):
 
     N = len(ap)+2
 

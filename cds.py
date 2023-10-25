@@ -1,15 +1,16 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import math
 
 
-# def exact_solution(phi_left, phi_right, u, L, rho, gamma, domain):
-#
-#     phi = np.zeros(x)
-#
-#     for x in domain:
-#         phi =
-#
-#     return phi
+def exact_solution(phi_left, phi_right, u, L, rho, gamma, domain):
+
+    pe = (rho * u * L) / (gamma)
+    phi = np.zeros(len(domain))
+    for i in range(0, len(domain)):
+        phi[i] = ( phi_left + ((phi_right - phi_left) * ((math.exp(domain[i]*(pe/L)) - 1)/((math.exp(pe)) - 1))))
+
+    return phi
 
 def a_point_coefficients(GAMMA: float, domain: np.array, debug=False): #TODO
     '''
