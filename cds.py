@@ -3,6 +3,15 @@ import matplotlib.pyplot as plt
 import math
 
 
+def power(my_list, pow):
+    return [x**pow for x in my_list]
+
+def oneover(my_list):
+    return [1/x for x in my_list]
+def exact_solution_general(A, B, domain, PE, L):
+    return A*np.exp(domain * (PE/L)) + B
+
+
 def exact_solution(phi_left, phi_right, u, L, rho, gamma, domain):
 
     pe = (rho * u * L) / (gamma)
@@ -226,4 +235,4 @@ def discretize_domain(len_domain: float, expansion_ratio: float, number_of_eleme
         plt.show()
 
 
-    return domain
+    return domain, delta_x
